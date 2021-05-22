@@ -1,6 +1,7 @@
 (ql:quickload '(:cl-json
                 :drakma
-                :cl-dotenv))
+                :cl-dotenv
+                :jsown))
 
 (setf drakma:*header-stream* *standard-output*)
 
@@ -17,12 +18,18 @@
 
 (defparameter *auth* (list (gethash "appcode" *keys*) (gethash "appkey" *keys*)))
 
+;; variable to store access token
+(defparameter *access-token* nil)
+
 
 (defun get-token ()
-  (let ((stream (drakma:http-request  "https://www.reddit.com/api/v1/access_token"
+  (let* ((stream (drakma:http-request  "https://www.reddit.com/api/v1/access_token"
                                      :additional-headers *headers*
                                      :method :post
                                      :parameters *data*
                                      :basic-authorization *auth*
-                                     :want-stream t)))
-    (json:decode-json stream)))
+                                     :want-stream t))
+         (credentials (json:decode-json stream)))
+    (setf *access-token*  (cdr (find :access--token credentials :key 'car)))))
+
+(get-token)
