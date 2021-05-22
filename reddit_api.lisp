@@ -1,7 +1,8 @@
 (ql:quickload '(:cl-json
                 :drakma
                 :cl-dotenv
-                :jsown))
+                :jsown
+                :access))
 
 (setf drakma:*header-stream* *standard-output*)
 
@@ -48,3 +49,14 @@
                                      :method :get
                                      :want-stream t)))
     (json:decode-json stream)))
+
+
+(find :data (cdr *out*) :key 'car)
+
+
+(defun get-data (data)
+  (let* ((params
+           (cdr (find :children  (cdr (find :data (cdr data) :key 'car)) :key 'car ))))
+    (mapcar #'(lambda (x) (find :title
+                           (cdr (find :data  (cdr x) :key 'car))
+                           :key 'car)) params)))
