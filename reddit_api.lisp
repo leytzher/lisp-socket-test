@@ -47,5 +47,4 @@
                                      :additional-headers *auth-headers*
                                      :method :get
                                      :want-stream t)))
-    (format t "~A~%" (json:decode-json stream))
-    ))
+    (json:decode-json stream)))
