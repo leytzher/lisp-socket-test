@@ -33,3 +33,19 @@
     (setf *access-token*  (cdr (find :access--token credentials :key 'car)))))
 
 (get-token)
+
+;;; Authenticate and start pulling data from Reddit
+;;;
+(defparameter *auth-headers*
+  (list (cons "user-agent" (gethash "appname" *keys*))
+        (cons "authorization" (concatenate 'string "bearer " *access-token*))))
+
+
+(defun get-hot (subreddit)
+  (let* ((url (concatenate 'string "https://oauth.reddit.com/r/" subreddit "/hot"))
+        (stream (drakma:http-request url
+                                     :additional-headers *auth-headers*
+                                     :method :get
+                                     :want-stream t)))
+    (format t "~A~%" (json:decode-json stream))
+    ))
