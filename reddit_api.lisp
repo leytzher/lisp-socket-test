@@ -1,4 +1,3 @@
-;; 
 (ql:quickload '(:cl-json
                 :drakma
                 :cl-dotenv))
@@ -18,23 +17,12 @@
 
 (defparameter *auth* (list (gethash "appcode" *keys*) (gethash "appkey" *keys*)))
 
-(defun retrieve-keys ()
-  (let* ((cookie-jar (make-instance 'drakma:cookie-jar))
-         (extra-headers *headers*)
-         (url "https://www.reddit.com/api/v1/access_token")
-         (stream (drakma:http-request url
-                                      :additional-headers extra-headers
-                                      :accept "application/json"
-                                      :content-type "application/x-www-form-urlencoded"
-                                      :method :post
-                                      :external-format-out :utf-8
-                                      :external-format-in :utf-8
-                                      :redirect 100
-                                      :cookie-jar cookie-jar
-                                      :content (json:encode-json-to-string *data*)
-                                      :basic-authorization *auth*
-                                      :want-stream t)))
+
+(defun get-token ()
+  (let ((stream (drakma:http-request  "https://www.reddit.com/api/v1/access_token"
+                                     :additional-headers *headers*
+                                     :method :post
+                                     :parameters *data*
+                                     :basic-authorization *auth*
+                                     :want-stream t)))
     (json:decode-json stream)))
-
-
-(retrieve-keys)
