@@ -51,12 +51,19 @@
     (json:decode-json stream)))
 
 
-(find :data (cdr *out*) :key 'car)
 
 
-(defun get-data (data)
-  (let* ((params
+(defun get-titles (data)
+  (let ((params
            (cdr (find :children  (cdr (find :data (cdr data) :key 'car)) :key 'car ))))
     (mapcar #'(lambda (x) (find :title
                            (cdr (find :data  (cdr x) :key 'car))
                            :key 'car)) params)))
+
+(defun get-urls (data)
+  (let ((params
+           (cdr (find :children  (cdr (find :data (cdr data) :key 'car)) :key 'car ))))
+    (mapcar #'(lambda (x) (find :url
+                           (cdr (find :data  (cdr x) :key 'car))
+                           :key 'car)) params)))
+
