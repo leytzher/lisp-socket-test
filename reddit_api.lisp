@@ -51,19 +51,20 @@
     (json:decode-json stream)))
 
 
+(defun get-best ()
+  (let* ((url  "https://oauth.reddit.com/best")
+         (stream (drakma:http-request url
+                                      :additional-headers *auth-headers*
+                                      :method :get
+                                      :want-stream t)))
+    (json:decode-json stream)))
 
 
-(defun get-titles (data)
-  (let ((params
-           (cdr (find :children  (cdr (find :data (cdr data) :key 'car)) :key 'car ))))
-    (mapcar #'(lambda (x) (find :title
-                           (cdr (find :data  (cdr x) :key 'car))
-                           :key 'car)) params)))
-
-(defun get-urls (data)
-  (let ((params
-           (cdr (find :children  (cdr (find :data (cdr data) :key 'car)) :key 'car ))))
-    (mapcar #'(lambda (x) (find :url
-                           (cdr (find :data  (cdr x) :key 'car))
-                           :key 'car)) params)))
-
+;;; attribute can be :title :url :timestamp, etc
+(defmacro reddit-data (subreddit attribute)
+  `(let ((params
+           (cdr (find :children  (cdr (find :data (cdr (get-hot, subreddit)) :key 'car)) :key 'car ))))
+    (mapcar #'(lambda (x) (cdr (find ,attribute
+                                (cdr (find :data  (cdr x) :key 'car))
+                                :key 'car))) params)))
+  )
